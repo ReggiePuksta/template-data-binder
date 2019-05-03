@@ -17,30 +17,41 @@ Scanner.prototype.setFragment = function(frag) {
   this.frag = frag;
 };
 
+Scanner.prototype.run = function(parentNode) {
+  this.results = scan(this.frag);
+  return this.results;
+};
+Scanner.prototype.getResults = function() {
+  return this.results;
+};
+/* ----- Private Methods ----- */
 /**
  * scan(): inputs DOM fragment and outputs
  * a list of nodes that contain {{}} inside their value
  * @param {DocumentFragment} DOM element or fragment
  * @return {Array} List of Nodes
- */
-Scanner.prototype.run = function(parentNode) {
-  var nodes = (parentNode && parentNode.childNodes)|| this.frag.childNodes;
+ * We create this as a separate private function, because it is
+ * easier to control recursion values in it's own functional scope.
+ * Introducing "this" and it's shared properties inside recursion,
+ * creates confusion.
+ * */
+var scan = function(parentNode) {
+  var nodes = parentNode.childNodes;
+  var results = [];
   for (var i = 0, len = nodes.length; i < len; i++) {
     var node = nodes[i];
-    // console.log(node);
     switch (node.nodeType) {
       case 1:
-        this.results.push(parseAttr(node));
-        this.results.push(this.run(node));
+        helper.combine(results, parseAttr(node));
+        helper.combine(results, scan(node));
         break;
       case 3:
-        this.results.push(parseText(node));
+        helper.combine(results, parseText(node));
         break;
     }
   }
-  return this.results;
+  return results;
 };
-/* Private Methods */
 var parseAttr = function(node) {
   // 1) We have to check all attributes in the element node
   var attributes = node.attributes;
@@ -51,10 +62,10 @@ var parseAttr = function(node) {
     if (key === undefined) {
       return;
     }
-    return {
-      target: node,
+    return [{
+      target: attr,
       key: key
-    };
+    }];
   }
   return attributeNodes;
 };
@@ -63,16 +74,15 @@ var parseText = function(node) {
   // 2) We need to create multiple child text nodes in case there
   // are multiple placeholders in the text
 
-  // There might be empty text nodes
   var unparsedTxt = node.textContent;
   var tokens = parse(unparsedTxt);
   if (tokens === undefined) {
     return;
   }
-  return {
+  return [{
     target: node,
     key: tokens,
-  };
+  }];
 };
 /**
  * parse()
@@ -87,8 +97,5 @@ var parse = function(text) {
   //  return;
   //}
   return text.match(/{{\s*([a-zA-Z0-9\.]+)\s*}}/)[1];
-};
-Scanner.prototype.getResults = function() {
-  return this.results;
 };
 module.exports = Scanner;

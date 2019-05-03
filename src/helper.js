@@ -11,11 +11,14 @@ exports.parseStringToFrag = function(html) {
   var frag = document.createDocumentFragment();
   var div = document.createElement('div');
   div.innerHTML = html;
-  while(div.firstChild) {
+  while (div.firstChild) {
     frag.appendChild(div.firstChild);
   }
 };
 
 exports.defaultFor = function(arg, val) {
   return typeof arg !== 'undefined' ? arg : val;
+};
+exports.combine = function(arr1, arr2) {
+  Array.prototype.push.apply(arr1, arr2);
 };
