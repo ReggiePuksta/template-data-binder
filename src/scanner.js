@@ -71,9 +71,8 @@ var parseAttr = function(node) {
 };
 var parseText = function(node) {
   // 1) We check if this node's value contains the placeholder
-  // 2) We need to create multiple child text nodes in case there
-  // are multiple placeholders in the text
-
+  // 2) TODO We need to create multiple child text nodes in case 
+  // there are multiple placeholders in the text
   var unparsedTxt = node.textContent;
   var tokens = parse(unparsedTxt);
   if (tokens === undefined) {
