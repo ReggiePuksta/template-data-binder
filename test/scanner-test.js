@@ -7,6 +7,7 @@ var frag2 = helper.parseStringToFrag('<div><p>{{user}}</p><a href="{{url}}"><b> 
 // '');
 
 describe('Scanner', function() {
+  
   it('should return bindable nodes if we input more complex fragment',
     function() {
       scanner.setFragment(frag1);

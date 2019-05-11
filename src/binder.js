@@ -18,18 +18,6 @@ Binder.prototype.setContext = function(context) {
 Binder.prototype.setUpdateFunc = function(func) {
   this.updateFunc = func;
 };
-/* quick solution for an update function.
- * We might need to add update function for each object returned by
- * Scanner.
- */
-var update = function(node, val) {
-    if (node instanceof Attr) {
-      node.value = val;
-    }
-    if (node instanceof Text) {
-      node.textContent = val;
-    }
-};
 /**
  * We call Object.defineProperty method on each context property 
  * that is in the bindings List
@@ -42,11 +30,12 @@ Binder.prototype.run = function() {
     var bind = binds[i];
     var bindingsKey = binds[i].key;
     var currentValue = context[bindingsKey];
-    defProperty(context, bind, currentValue, update);
-    update(bind.target, currentValue);
+    defProperty(context, bind, currentValue, bind.update.bind(bind));
+    bind.update(currentValue);
   }
 };
 /* Private methods */
+
 var defProperty = function(obj, prop, current, after) {
   Object.defineProperty(obj,prop.key, {
     get: function() {
@@ -55,7 +44,7 @@ var defProperty = function(obj, prop, current, after) {
     set: function(val) {
       current = val;
       if (after) {
-        after(prop.target, val);
+        after(val);
       }
     }
   });

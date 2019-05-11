@@ -9,10 +9,16 @@ describe('Binder', function() {
     var text = document.createTextNode('Text Inside');
     binds = [{
       target: url,
-      key: 'Address'
+      key: 'Address',
+      update: function(val) {
+        this.target.value= val;
+      }
     }, {
       target: text,
-      key: 'name'
+      key: 'name',
+      update: function(val) {
+        this.target.textContent = val;
+      }
     }];
   });
   beforeEach(function() {

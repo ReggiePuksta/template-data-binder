@@ -14,7 +14,12 @@ var Scanner = function(frag) {
   this.results = [];
 };
 Scanner.prototype.setFragment = function(frag) {
+  if (typeof frag === 'string') {
+    this.frag = helper.parseStringToFrag(frag);
+    return this.frag;
+  }
   this.frag = frag;
+  return this.frag;
 };
 
 Scanner.prototype.run = function(parentNode) {
@@ -64,7 +69,11 @@ var parseAttr = function(node) {
     }
     return [{
       target: attr,
-      key: key
+      key: key,
+      update: function(val) {
+        console.log(this);
+        this.target.value = val;
+      }
     }];
   }
   return attributeNodes;
@@ -81,6 +90,9 @@ var parseText = function(node) {
   return [{
     target: node,
     key: tokens,
+    update: function(val) {
+      this.target.textContent = val;
+    }
   }];
 };
 /**

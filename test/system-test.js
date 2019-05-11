@@ -1,13 +1,15 @@
-var binding = require('../src/binding.js');
+var binding = require('../src/index.js');
 
-var html = '<div>{{ID}}</div>';
+var html = '<div>{{id}}</div>';
 var context = {
   id: 5
 };
-describe('Bindings', function() {
-  beforeEach(function() {
-  });
+describe('Binding', function() {
   it('Template should return with updated data automatically', function() {
-    binding(html, context).textContent.should.be.equal(5);
+    var fragment = binding.binder(html, context);
+    console.log(fragment.children[0]);
+    fragment.children[0].textContent.should.be.equal('5');
+    context.id = 8;
+    fragment.children[0].textContent.should.be.equal('8');
   });
 });
